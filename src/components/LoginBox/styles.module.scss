@@ -26,4 +26,16 @@
 	font-weight: bold;
 	text-transform: uppercase;
 	text-decoration: none;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		margin-right: 16px;
+	}
+
+	&:hover {
+		filter: brightness(0.9);
+	}
 }
