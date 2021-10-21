@@ -2,6 +2,7 @@ import styles from './styles.module.scss';
 import logoImg from '../../assets/logo.svg';
 import { api } from '../../services/api';
 import { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 
 interface MessageProps {
 	id: string;
@@ -12,9 +13,32 @@ interface MessageProps {
 	}
 }
 
+const messageQueue: MessageProps[] = [];
+
+const socket = io("http://localhost:4000");
+
+socket.on('new_message', (newMessage: MessageProps) => {
+	messageQueue.push(newMessage);
+});
+
 export function MessageList() {
 
 	const [ messages, setMessages ] = useState<MessageProps[]>([]);
+
+	// This is a effect to show messages on screen
+	useEffect(() => {
+		const timer = setInterval(() => {
+			if (messageQueue.length > 0) {
+				setMessages(prevState => [
+					messageQueue[0],
+					prevState[0],
+					prevState[1],
+				].filter(Boolean))
+
+				messageQueue.shift();
+			}
+		}, 3000)
+	}, [])
 
 	useEffect(() => {
 		api.get<MessageProps[]>('messages/last3').then(response => setMessages(response.data));
